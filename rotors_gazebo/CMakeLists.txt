@@ -69,6 +69,10 @@ add_executable(hovering_example src/hovering_example.cpp)
 target_link_libraries(hovering_example ${catkin_LIBRARIES})
 add_dependencies(hovering_example ${catkin_EXPORTED_TARGETS})
 
+add_executable(circle_waypoints_pub src/circle_waypoints_pub.cpp)
+target_link_libraries(circle_waypoints_pub ${catkin_LIBRARIES})
+add_dependencies(circle_waypoints_pub ${catkin_EXPORTED_TARGETS})
+
 foreach(dir launch models resource worlds)
    install(DIRECTORY ${dir}/
       DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/${dir})

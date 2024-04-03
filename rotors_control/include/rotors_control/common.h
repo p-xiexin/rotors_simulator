@@ -95,6 +95,7 @@ inline void calculateAllocationMatrix(const RotorConfiguration& rotor_configurat
     (*allocation_matrix)(3, i) = rotor.rotor_force_constant;
     ++i;
   }
+  // std::cout << "无人机的旋翼数量：" << rotor_configuration.rotors.size() << std::endl;
   Eigen::FullPivLU<Eigen::Matrix4Xd> lu(*allocation_matrix);
   // Setting the threshold for when pivots of the rank calculation should be considered nonzero.
   lu.setThreshold(1e-9);

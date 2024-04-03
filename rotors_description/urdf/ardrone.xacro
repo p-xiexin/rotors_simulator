@@ -54,7 +54,7 @@
     robot_namespace="${namespace}"
     suffix="front_right"
     direction="ccw"
-    motor_constant="${motor_constant}"
+    motor_constant="5.54858e-06"
     moment_constant="${moment_constant}"
     parent="${namespace}/base_link"
     mass_rotor="${mass_rotor}"
