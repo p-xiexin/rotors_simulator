@@ -70,7 +70,7 @@ void LeePositionController::CalculateRotorVelocities(Eigen::VectorXd* rotor_velo
   ComputeDesiredAngularAcc(acceleration, &angular_acceleration);
 
   // Project thrust onto body z axis.
-  double thrust = -vehicle_parameters_.mass_ * acceleration.dot(odometry_.orientation.toRotationMatrix().col(2));
+  double thrust = vehicle_parameters_.mass_ * acceleration.dot(odometry_.orientation.toRotationMatrix().col(2));
 
   Eigen::Vector4d angular_acceleration_thrust;
   angular_acceleration_thrust.block<3, 1>(0, 0) = angular_acceleration;
@@ -105,9 +105,9 @@ void LeePositionController::ComputeDesiredAcceleration(Eigen::Vector3d* accelera
 
   Eigen::Vector3d e_3(Eigen::Vector3d::UnitZ());
 
-  *acceleration = (position_error.cwiseProduct(controller_parameters_.position_gain_)
-      + velocity_error.cwiseProduct(controller_parameters_.velocity_gain_)) / vehicle_parameters_.mass_
-      - vehicle_parameters_.gravity_ * e_3 - command_trajectory_.acceleration_W;
+  *acceleration = (-position_error.cwiseProduct(controller_parameters_.position_gain_)
+      - velocity_error.cwiseProduct(controller_parameters_.velocity_gain_)) / vehicle_parameters_.mass_
+      - (-9.81) * e_3 + command_trajectory_.acceleration_W;
 }
 
 // Implementation from the T. Lee et al. paper
@@ -124,7 +124,7 @@ void LeePositionController::ComputeDesiredAngularAcc(const Eigen::Vector3d& acce
   b1_des << cos(yaw), sin(yaw), 0;
 
   Eigen::Vector3d b3_des;
-  b3_des = -acceleration / acceleration.norm();
+  b3_des = acceleration / acceleration.norm();
 
   Eigen::Vector3d b2_des;
   b2_des = b3_des.cross(b1_des);
@@ -144,7 +144,8 @@ void LeePositionController::ComputeDesiredAngularAcc(const Eigen::Vector3d& acce
   Eigen::Vector3d angular_rate_des(Eigen::Vector3d::Zero());
   angular_rate_des[2] = command_trajectory_.getYawRate();
 
-  Eigen::Vector3d angular_rate_error = odometry_.angular_velocity - R_des.transpose() * R * angular_rate_des;
+  // Eigen::Vector3d angular_rate_error = odometry_.angular_velocity - R_des.transpose() * R * angular_rate_des;
+  Eigen::Vector3d angular_rate_error = odometry_.angular_velocity - R.transpose() * R_des * angular_rate_des;
 
   *angular_acceleration = -1 * angle_error.cwiseProduct(normalized_attitude_gain_)
                            - angular_rate_error.cwiseProduct(normalized_angular_rate_gain_)
